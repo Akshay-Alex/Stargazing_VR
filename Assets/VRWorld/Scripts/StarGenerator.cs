@@ -17,14 +17,7 @@ public class StarGenerator : MonoBehaviour
     float r = 1000.0f,mag,ra,dec,x,y,z;
     void Awake()
     {
-        starsGenerated = false;
-    }
-    void LateUpdate()
-    {
-        if (!starsGenerated)
-        {
-            GenerateStars();
-        }
+        GenerateStars();
     }
     void GenerateStars()
     {
