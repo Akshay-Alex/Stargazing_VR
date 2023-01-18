@@ -253,18 +253,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e8d7601e42b56a4fbbeaa5e1729b13d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowOnlySirius: 0
   StarPrefab: {fileID: 1889762957360050728, guid: 6d5a9f9b7eaf2ac46a5c0ee666a4fd44, type: 3}
   StarParent: {fileID: 679618576}
+  ShowOnlySirius: 1
+  azimuth: 0
+  altitude: 0
+  julianDate: 0
   referenceStarDecDegree: 0
   referenceStarRaDegree: 0
-  maxParticles: 10000
   StarData: {fileID: 4900000, guid: 7c1ddd9531c0b664eb16218d7c90fb0d, type: 3}
   StarDataDegreesAndRadians: {fileID: 4900000, guid: f1f8f8914c100ed4189a677d42466e02, type: 3}
-  DataLines: []
-  ReferenceStarData: []
-  lines: []
-  starsGenerated: 0
+  maxParticles: 10000
   DistanceMultiplier: 1000
 --- !u!1001 &899219751
 PrefabInstance:
