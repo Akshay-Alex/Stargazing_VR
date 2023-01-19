@@ -76,7 +76,7 @@ public class StarGenerator : MonoBehaviour
                 Debug.Log("Julian date is " + julianDate);
                 //Debug.Log("Sirius star RA is " + siriusStarInfo.RA + " and DEC is " + siriusStarInfo.Declination);
                 Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + 10.850516 + " lon " + 76.271080 + " jd " + 2459962.832704942);
-                RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, 10.850516, 76.271080, 2459962.832704942);
+                RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, 10.850516*degreeToRadianMultiplier, 76.271080 * degreeToRadianMultiplier, 2459962.832704942);
             }
             else
                 Debug.Log("jd was 0");
@@ -98,9 +98,9 @@ public class StarGenerator : MonoBehaviour
 
         if (az < 0)
         { az += 2 * Math.PI; }
-        altitude = a;
-        azimuth = az;
-        Debug.Log("Altitude " + a + " Azimuth " + az);
+        altitude = a/degreeToRadianMultiplier;
+        azimuth = az/degreeToRadianMultiplier;
+        Debug.Log("Altitude " + altitude + " Azimuth " + azimuth);
     }
 
    
