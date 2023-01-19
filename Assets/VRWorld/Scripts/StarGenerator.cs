@@ -21,7 +21,7 @@ public class StarGenerator : MonoBehaviour
     private JulianDateData julianDateData;
     public class StarInfo
     {
-        public double RA, Declination, Magnitude;
+        public double RA, Declination; //data is stored in radians
     }
     private StarInfo siriusStarInfo = new StarInfo();
 
@@ -74,7 +74,8 @@ public class StarGenerator : MonoBehaviour
             if (julianDate != 0d)
             {
                 Debug.Log("Julian date is " + julianDate);
-                Debug.Log("Sirius star RA is " + siriusStarInfo.RA + " and DEC is " + siriusStarInfo.Declination);
+                //Debug.Log("Sirius star RA is " + siriusStarInfo.RA + " and DEC is " + siriusStarInfo.Declination);
+                Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + 10.850516 + " lon " + 76.271080 + " jd " + 2459962.832704942);
                 RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, 10.850516, 76.271080, 2459962.832704942);
             }
             else
@@ -140,7 +141,7 @@ public class StarGenerator : MonoBehaviour
                 dec = float.Parse(components[1]);
                 ra = float.Parse(components[2]);
                 decInRadian = dec * degreeToRadianMultiplier;
-                raInRadian = ra * -15.0d * degreeToRadianMultiplier;
+                raInRadian = ra * 15.0d * degreeToRadianMultiplier;
 
 
                 SphericalToCartesian(raInRadian, decInRadian, r, ref x, ref y, ref z);
@@ -149,9 +150,8 @@ public class StarGenerator : MonoBehaviour
 
                 if(starNumber == 1)         //storing data of star sirius
                 {
-                    siriusStarInfo.Magnitude = mag;
-                    siriusStarInfo.RA = ra;
-                    siriusStarInfo.Declination = dec;
+                    siriusStarInfo.RA = raInRadian;
+                    siriusStarInfo.Declination = decInRadian;
                 }
             }
       
@@ -228,7 +228,7 @@ public class StarGenerator : MonoBehaviour
         ReferenceStarData = DataLines[1].Split(',');
         referenceStarDecDegree = double.Parse(ReferenceStarData[1]);
         referenceStarRaDegree = double.Parse(ReferenceStarData[2]);
-        StarParent.transform.eulerAngles = new Vector3(0f, ((float)referenceStarRaDegree*15f), ((float)referenceStarDecDegree));
+        StarParent.transform.eulerAngles = new Vector3(0f, -((float)referenceStarRaDegree*15f), -((float)referenceStarDecDegree));
     }
     #endregion
 }
