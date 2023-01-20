@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.Networking;
+using DG.Tweening;
 
 public class StarGenerator : MonoBehaviour
 {
@@ -37,10 +38,12 @@ public class StarGenerator : MonoBehaviour
 
     //variables used to generate stars from excel sheet
     public int maxParticles = 10000;
-    private Vector3 normalizedPosition;
+    private Vector3 normalizedPosition,siriusAtHorizonPosition;
     public float DistanceMultiplier;
     double  degreeToRadianMultiplier = Math.PI/180d;
-    double r = 100.0f, mag, ra, dec, x, y, z, raInRadian, decInRadian;//everything is in radian
+    double r = 100.0f, mag, ra, dec, x, y, z, raInRadian, decInRadian;//everything is in radian 
+    // whenever we use RA it can be seen multiplied with a factor of 15.
+    // this is because RA is in hours and to convert it to degrees 
     void Start()
     {
         InitializeFlags();
@@ -70,20 +73,19 @@ public class StarGenerator : MonoBehaviour
         }
         else
         {
-            Debug.Log(" recursive function called inside else");
             if (julianDate != 0d)
             {
-                Debug.Log("Julian date is " + julianDate);
                 //Debug.Log("Sirius star RA is " + siriusStarInfo.RA + " and DEC is " + siriusStarInfo.Declination);
                 Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + 10.850516 + " lon " + 76.271080 + " jd " + 2459962.832704942);
-                RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, 10.850516*degreeToRadianMultiplier, 76.271080 * degreeToRadianMultiplier, 2459962.832704942);
+                (altitude,azimuth) = RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, 10.850516*degreeToRadianMultiplier, 76.271080 * degreeToRadianMultiplier, 2459962.832704942);
+                PositionSiriusAtRealtimePosition(altitude, azimuth);
             }
             else
                 Debug.Log("jd was 0");
         }
 
     }
-    void RaDectoAltAz(double ra, double dec, double lat, double lon, double jd)
+    (double,double) RaDectoAltAz(double ra, double dec, double lat, double lon, double jd)
     {
         double gmst = greenwichMeanSiderealTime(jd);
         double localSiderealTime = (gmst + lon) % (2 * Math.PI);
@@ -98,9 +100,9 @@ public class StarGenerator : MonoBehaviour
 
         if (az < 0)
         { az += 2 * Math.PI; }
-        altitude = a/degreeToRadianMultiplier;
-        azimuth = az/degreeToRadianMultiplier;
-        Debug.Log("Altitude " + altitude + " Azimuth " + azimuth);
+        a /= degreeToRadianMultiplier;
+        az /= degreeToRadianMultiplier;
+        return (a, az);
     }
 
    
@@ -227,8 +229,16 @@ public class StarGenerator : MonoBehaviour
     {
         ReferenceStarData = DataLines[1].Split(',');
         referenceStarDecDegree = double.Parse(ReferenceStarData[1]);
-        referenceStarRaDegree = double.Parse(ReferenceStarData[2]);
-        StarParent.transform.eulerAngles = new Vector3(0f, -((float)referenceStarRaDegree*15f), -((float)referenceStarDecDegree));
+        referenceStarRaDegree = double.Parse(ReferenceStarData[2]) * 15d;  //ra is expressed in hours, need to convert to degree.
+        StarParent.transform.eulerAngles = new Vector3(0f, -((float)referenceStarRaDegree), -((float)referenceStarDecDegree));
+        siriusAtHorizonPosition = StarParent.transform.eulerAngles;
+    }
+    void PositionSiriusAtRealtimePosition(double localAltitude, double localAzimuth)
+    {
+        Vector3 offsetVector = new Vector3(0f, (float)localAzimuth, (float)localAltitude);
+        Vector3 newPositionOfSirius = siriusAtHorizonPosition + offsetVector;
+        //StarParent.transform.eulerAngles += offsetVector;
+        StarParent.transform.DORotate(newPositionOfSirius, 1f);
     }
     #endregion
 }
