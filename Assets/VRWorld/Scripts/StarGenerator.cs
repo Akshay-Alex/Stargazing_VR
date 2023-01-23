@@ -12,7 +12,7 @@ public class StarGenerator : MonoBehaviour
     public GameObject StarParent;
     //flags
     private bool starsGenerated, webRequestDataReceived;
-    public bool ShowOnlySirius;
+    public bool ShowTwoStars;
     //class used to parse json data
     [System.Serializable]
     public class JulianDateData
@@ -29,6 +29,7 @@ public class StarGenerator : MonoBehaviour
     public double azimuth, altitude, julianDate, referenceStarDecDegree, referenceStarRaDegree;
 
     //properties
+
 
     //variables used to parse excel sheet
     public TextAsset StarData;
@@ -53,16 +54,27 @@ public class StarGenerator : MonoBehaviour
    
     void Awake()
     {
-        if (ShowOnlySirius)
-        {
-            maxParticles = 2;
-        }
+
+
+        GenerateAndPositionStars();
+
+    }
+    public void ToggleStarVisibility()
+    {
+        Transform starParentTransform = StarParent.transform;
+            for(int index = 2; index < maxParticles-1; index++)
+            {
+                starParentTransform.GetChild(index).gameObject.SetActive(!ShowTwoStars);
+            }
+        ShowTwoStars = !ShowTwoStars;
+    }
+  
+    public void GenerateAndPositionStars()
+    {
         GenerateStars();
         PositionSiriusAtHorizon();
         StartCoroutine(CalculateSiriusRealtimePosition());
-
     }
-
     #region Functions to calculate realtime position
     IEnumerator CalculateSiriusRealtimePosition()
     {
@@ -177,8 +189,8 @@ public class StarGenerator : MonoBehaviour
     #region Julian Date calculation
     void FindJulianDate()
     {
-        //DateTime TimeInUTC = DateTime.Now.ToUniversalTime();
-        DateTime TimeInUTC = new DateTime(2023, 01, 19, 12, 00, 00); //today noon
+        DateTime TimeInUTC = DateTime.Now.ToUniversalTime();
+        //DateTime TimeInUTC = new DateTime(2023, 01, 19, 12, 00, 00); //today noon
         string request = String.Format("https://ssd-api.jpl.nasa.gov/jd_cal.api?cd={0}-{1}-{2}%20{3}", TimeInUTC.Year, TimeInUTC.Month, TimeInUTC.Day, TimeInUTC.ToString("HH:mm"));
         StartCoroutine(SendRequestForJulianDate(request));
     }
