@@ -7,11 +7,13 @@ using DG.Tweening;
 
 public class StarGenerator : MonoBehaviour
 {
+    public LocationService locationService;
+    private float latitude, longitude;
     //prefab used to instantiate stars
     public GameObject StarPrefab;
     public GameObject StarParent;
     //flags
-    private bool starsGenerated, webRequestDataReceived;
+    private bool starsGenerated, JulianDateWebRequestDone, locationDataFetched;
     public bool ShowTwoStars;
     //class used to parse json data
     [System.Serializable]
@@ -73,23 +75,38 @@ public class StarGenerator : MonoBehaviour
     {
         GenerateStars();
         PositionSiriusAtHorizon();
+        StartCoroutine(GetLocationData());
         StartCoroutine(CalculateSiriusRealtimePosition());
+    }
+    IEnumerator GetLocationData()
+    {
+        if(locationService.locationWebRequestDone)
+        {
+            (latitude, longitude) = locationService.GetLatitudeAndLongitude();
+            locationDataFetched = true;
+        }
+        else
+        {
+            yield return new WaitForSeconds(1);         //waits till locationWebRequest is Done
+            StartCoroutine(GetLocationData());
+        }
     }
     #region Functions to calculate realtime position
     IEnumerator CalculateSiriusRealtimePosition()
     {
-        if (webRequestDataReceived == false)
+        if (JulianDateWebRequestDone == false || locationDataFetched == false)
         {
-            yield return new WaitForSeconds(1);         //waits till julian date webrequest is done
+            Debug.Log("Julian date received : " + JulianDateWebRequestDone + " location data received : " + locationDataFetched);
+            yield return new WaitForSeconds(1);         //waits till julian date webrequest and location data web request is done
             StartCoroutine(CalculateSiriusRealtimePosition());
         }
         else
         {
-            if (julianDate != 0d)
+            if (julianDate != 0d )
             {
                 //Debug.Log("Sirius star RA is " + siriusStarInfo.RA + " and DEC is " + siriusStarInfo.Declination);
-                Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + 10.850516 + " lon " + 76.271080 + " jd " + 2459962.832704942);
-                (altitude,azimuth) = RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, 10.850516*degreeToRadianMultiplier, 76.271080 * degreeToRadianMultiplier, 2459962.832704942);
+                Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + latitude + " lon " + longitude + " jd " + julianDate);
+                (altitude,azimuth) = RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, latitude*degreeToRadianMultiplier, longitude * degreeToRadianMultiplier, julianDate);
                 PositionSiriusAtRealtimePosition(altitude, azimuth);
             }
             else
@@ -200,7 +217,7 @@ public class StarGenerator : MonoBehaviour
         {
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
-            webRequestDataReceived = true;
+            JulianDateWebRequestDone = true;
             string[] pages = uri.Split('/');
             int page = pages.Length - 1;
             switch (webRequest.result)
@@ -228,14 +245,17 @@ public class StarGenerator : MonoBehaviour
     #region Initialization functions
     void InitializeFlags()
     {
-        webRequestDataReceived = false;
+        JulianDateWebRequestDone = false;
         starsGenerated = false;
+        locationDataFetched = false;
     }
     void InitializeProperties()
     {
         altitude = 0d;
         azimuth = 0d;
         julianDate = 0d;
+        latitude = 0f;
+        longitude = 0f;
     }
     void PositionSiriusAtHorizon()
     {
