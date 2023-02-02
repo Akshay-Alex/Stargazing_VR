@@ -7,7 +7,7 @@ using DG.Tweening;
 
 public class StarGenerator : MonoBehaviour
 {
-    public LocationService locationService;
+    public GPSService gPSService;
     private float latitude, longitude;
     //prefab used to instantiate stars
     public GameObject StarPrefab;
@@ -76,17 +76,23 @@ public class StarGenerator : MonoBehaviour
         GenerateStars();
         PositionSiriusAtHorizon();
         StartCoroutine(GetLocationData());
-        StartCoroutine(CalculateSiriusRealtimePosition());
+        //StartCoroutine(CalculateSiriusRealtimePosition());
     }
     IEnumerator GetLocationData()
     {
-        if(locationService.locationWebRequestDone)
+        if(gPSService.locationWebRequestDone)
         {
-            (latitude, longitude) = locationService.GetLatitudeAndLongitude();
+            (latitude, longitude) = gPSService.GetLatitudeAndLongitude();
             locationDataFetched = true;
+            Debug.Log("Location data received ");
         }
         else
         {
+            //Debug.Log("locationWebRequest not done ");
+            if(Input.location.status != LocationServiceStatus.Running)
+            {
+                Input.location.Start();
+            }
             yield return new WaitForSeconds(1);         //waits till locationWebRequest is Done
             StartCoroutine(GetLocationData());
         }

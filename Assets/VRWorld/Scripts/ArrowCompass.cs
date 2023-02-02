@@ -1,9 +1,10 @@
 using UnityEngine;
 using System;
 
+
 public class ArrowCompass : MonoBehaviour
 {
-    public LocationService locationService;
+    public GPSService gPSService;
     void Awake()
     {
 
@@ -12,9 +13,9 @@ public class ArrowCompass : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(locationService.locationWebRequestDone)
+        if(gPSService.locationWebRequestDone)
         {
-            transform.rotation = Quaternion.Euler(0, locationService.GetNorthTrueHeading(), 0);
+            transform.rotation = Quaternion.Euler(90, 0, gPSService.GetNorthTrueHeading());
         }
        
     }
