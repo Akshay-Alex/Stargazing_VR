@@ -5,20 +5,17 @@ using UnityEngine;
 public class ButtonManager : MonoBehaviour
 {
     public StarGenerator starGenerator;
-    public GameObject Compass;
-    bool isCompassActive;
+    public GameObject logs;
 
     private void Start()
     {
-        isCompassActive = false;
     }
     public void ToggleStars()
     {
         starGenerator.ToggleStarVisibility();
     }
-    public void ToggleCompass()
+    public void ToggleLogs()
     {
-        isCompassActive = !isCompassActive;
-        Compass.SetActive(isCompassActive);
+        logs.SetActive(!logs.activeSelf);
     }
 }

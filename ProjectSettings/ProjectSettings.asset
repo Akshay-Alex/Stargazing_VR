@@ -139,6 +139,7 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 11400000, guid: 800f7226d1299434e9f4c95341185e58, type: 2}
   - {fileID: 11400000, guid: 905fb3634e6cc544b8ac0d9ea5b1ea5c, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -258,7 +259,7 @@ PlayerSettings:
   AndroidIsGame: 1
   AndroidEnableTango: 0
   androidEnableBanner: 1
-  androidUseLowAccuracyLocation: 0
+  androidUseLowAccuracyLocation: 1
   androidUseCustomKeystore: 0
   m_AndroidBanners:
   - width: 320

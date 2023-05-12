@@ -4,64 +4,77 @@ using TMPro;
 public class GPSService : MonoBehaviour
 {
     public TextMeshPro logtext;
-    public bool locationWebRequestDone;
+    public bool locationWebRequestDone,compassRunning = false;
     public int waitTime = 20;
+    public float compassvalue = 0f;
+    public int count = 0;
     private void Start()
     {
-        StartCoroutine(CheckLocationServiceStatus());
     }
 
     public IEnumerator CheckLocationServiceStatus()
     {
-        logtext.text = "Started";
-        if (!Input.location.isEnabledByUser)
+        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.CoarseLocation))
         {
+            UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.CoarseLocation);
+        }
+
+        // First, check if user has location service enabled
+        if (!UnityEngine.Input.location.isEnabledByUser)
+        {
+            // TODO Failure
+           Debug.Log("Android and Location not enabled");
             yield break;
         }
-        Input.compass.enabled = true;
-        Input.location.Start();
-
-        int waitTime = 20;
+        Input.location.Start(600);
+        waitTime = 20;
+        /*
+        StartCoroutine(StartCompass());
+        if (!compassRunning)
+        {
+            // TODO Failure
+            Debug.Log("Compass not started");
+            yield break;
+        }
+        */
+        Debug.Log("Function called " + " compass enabled " + Input.compass.enabled + " location service status " + Input.location.status);
+        waitTime = 20;
         while(Input.location.status == LocationServiceStatus.Initializing && waitTime > 0)
         {
             yield return new WaitForSeconds(1);
             waitTime--;
-            logtext.text = waitTime.ToString();
+            Debug.Log(waitTime + " compass enabled " + Input.compass.enabled + " location service status " + Input.location.status);
         }
         if(waitTime < 1)
         {
-            logtext.text = "Time out";
-            yield break;
+            Debug.Log("Time out" + " compass enabled " + Input.compass.enabled + " location service status " + Input.location.status);
+            //yield break;
         }
         if(Input.location.status == LocationServiceStatus.Failed)
         {
-            logtext.text = "failed";
-            yield break;
+            Debug.Log("failed" + " compass enabled " + Input.compass.enabled + " location service status " + Input.location.status);
+            //yield break;
         }
-        else
+        else if(Input.location.status == LocationServiceStatus.Running)
         {
-            logtext.text = "Running";
-            InvokeRepeating("UpdateLocationData", 0.5f, 1f);
+            Debug.Log("Running");
+            UpdateLocationData();
         }
-
+        Input.location.Stop();
+        StopCoroutine(CheckLocationServiceStatus());
+        Debug.Log("Function call end " + " compass enabled " + Input.compass.enabled + " location service status " + Input.location.status);
     }
     private void UpdateLocationData()
     {
-        if(Input.location.status == LocationServiceStatus.Running)
-        {
-            logtext.text = "location "+Input.location.lastData.latitude + " " + Input.location.lastData.longitude + "true heading " + Input.compass.trueHeading;
+        Debug.Log("location " +Input.location.lastData.latitude + " " + Input.location.lastData.longitude + "true heading " + Input.compass.trueHeading);
+            //compassvalue = Input.compass.trueHeading;
             locationWebRequestDone = true;
-        }
-        else
-        {
-            logtext.text = "stopped";
-        }
     }
     public float GetNorthTrueHeading()
     {
         if (locationWebRequestDone)
         {
-            return -Input.compass.trueHeading;
+            return compassvalue;
         }
         return 0f;
     }
@@ -76,5 +89,31 @@ public class GPSService : MonoBehaviour
     public void StartLocationService()
     {
         StartCoroutine(CheckLocationServiceStatus());
+    }
+    public IEnumerator StartCompass()
+    {
+        if (Input.compass.enabled)
+        {
+            compassRunning = true;
+            Debug.Log("Compass Started");
+            yield return null;
+        }
+        else if (waitTime < 0)
+        {
+            Debug.Log("Compass Timeout");
+            yield return null;
+        }
+        else
+        {
+            waitTime--;
+            Input.compass.enabled = true;
+            Debug.Log("Waiting for compass to start " + waitTime);
+            yield return new WaitForSeconds(1);
+            StartCoroutine(StartCompass());
+        }
+    }
+    private void Update()
+    {
+        logtext.text = "Compass enabled : " + Input.compass.enabled + " Location Service status " + Input.location.status;
     }
 }

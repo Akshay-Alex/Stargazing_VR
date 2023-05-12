@@ -24,7 +24,7 @@ public class StarGenerator : MonoBehaviour
     private JulianDateData julianDateData;
     public class StarInfo
     {
-        public double RA, Declination; //data is stored in radians
+        public double RA, Declination; //data is stored in degrees
     }
     private StarInfo siriusStarInfo = new StarInfo();
 
@@ -34,7 +34,7 @@ public class StarGenerator : MonoBehaviour
 
 
     //variables used to parse excel sheet
-    public TextAsset StarData;
+    //public TextAsset StarData;
     public TextAsset StarDataDegreesAndRadians;
     private string[] DataLines, ReferenceStarData;
     private string[] lines;
@@ -44,7 +44,7 @@ public class StarGenerator : MonoBehaviour
     private Vector3 normalizedPosition,siriusAtHorizonPosition;
     public float DistanceMultiplier;
     double  degreeToRadianMultiplier = Math.PI/180d;
-    double r = 100.0f, mag, ra, dec, x, y, z, raInRadian, decInRadian;//everything is in radian 
+    double r = 100.0f, mag, ra, dec, x, y, z, raInRadian, decInRadian;
     // whenever we use RA it can be seen multiplied with a factor of 15.
     // this is because RA is in hours and to convert it to degrees 
     void Start()
@@ -75,7 +75,7 @@ public class StarGenerator : MonoBehaviour
     {
         GenerateStars();
         PositionSiriusAtHorizon();
-        StartCoroutine(GetLocationData());
+        //StartCoroutine(GetLocationData());
         //StartCoroutine(CalculateSiriusRealtimePosition());
     }
     IEnumerator GetLocationData()
@@ -100,7 +100,7 @@ public class StarGenerator : MonoBehaviour
     #region Functions to calculate realtime position
     IEnumerator CalculateSiriusRealtimePosition()
     {
-        if (JulianDateWebRequestDone == false || locationDataFetched == false)
+        if (JulianDateWebRequestDone == false)
         {
             Debug.Log("Julian date received : " + JulianDateWebRequestDone + " location data received : " + locationDataFetched);
             yield return new WaitForSeconds(1);         //waits till julian date webrequest and location data web request is done
@@ -111,15 +111,20 @@ public class StarGenerator : MonoBehaviour
             if (julianDate != 0d )
             {
                 //Debug.Log("Sirius star RA is " + siriusStarInfo.RA + " and DEC is " + siriusStarInfo.Declination);
-                Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + latitude + " lon " + longitude + " jd " + julianDate);
-                (altitude,azimuth) = RaDectoAltAz(siriusStarInfo.RA, siriusStarInfo.Declination, latitude*degreeToRadianMultiplier, longitude * degreeToRadianMultiplier, julianDate);
+                //Debug.Log("RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + latitude + " lon " + longitude + " jd " + julianDate);
+                (altitude,azimuth) = RaDectoAltAz(siriusStarInfo.RA*15 *degreeToRadianMultiplier, siriusStarInfo.Declination * degreeToRadianMultiplier, latitude*degreeToRadianMultiplier, longitude * degreeToRadianMultiplier, julianDate);
+                Debug.Log("altitude " + altitude + " azimuth" + azimuth + "RA " + siriusStarInfo.RA + " DEC " + siriusStarInfo.Declination + " lat " + latitude + " lon " + longitude + " jd " + julianDate);
                 PositionSiriusAtRealtimePosition(altitude, azimuth);
+
             }
             else
                 Debug.Log("jd was 0");
         }
 
     }
+    //!Do not touch this
+    //Function working properly
+    //reference website https://astrogreg.com/convert_ra_dec_to_alt_az.html
     (double,double) RaDectoAltAz(double ra, double dec, double lat, double lon, double jd)
     {
         double gmst = greenwichMeanSiderealTime(jd);
@@ -187,8 +192,8 @@ public class StarGenerator : MonoBehaviour
 
                 if(starNumber == 1)         //storing data of star sirius
                 {
-                    siriusStarInfo.RA = raInRadian;
-                    siriusStarInfo.Declination = decInRadian;
+                    siriusStarInfo.RA = ra;
+                    siriusStarInfo.Declination = dec;
                 }
             }
       
@@ -241,6 +246,8 @@ public class StarGenerator : MonoBehaviour
                     string jsonString = webRequest.downloadHandler.text;
                     julianDateData = JsonUtility.FromJson<JulianDateData>(jsonString);
                     julianDate = Convert.ToDouble(julianDateData.jd);
+                    Debug.Log("Julian date is " + julianDate);
+                    StartCoroutine(CalculateSiriusRealtimePosition());
                     yield return null;
                     break;
             }
