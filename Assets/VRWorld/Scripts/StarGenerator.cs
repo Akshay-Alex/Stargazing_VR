@@ -7,6 +7,7 @@ using DG.Tweening;
 
 public class StarGenerator : MonoBehaviour
 {
+    public static StarGenerator SG;
     public GPSService gPSService;
     private float latitude, longitude;
     //prefab used to instantiate stars
@@ -49,6 +50,7 @@ public class StarGenerator : MonoBehaviour
     // this is because RA is in hours and to convert it to degrees 
     void Start()
     {
+        SG = this;
         InitializeFlags();
         InitializeProperties();
         FindJulianDate();

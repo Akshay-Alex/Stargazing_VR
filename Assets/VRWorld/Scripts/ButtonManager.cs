@@ -4,18 +4,27 @@ using UnityEngine;
 
 public class ButtonManager : MonoBehaviour
 {
-    public StarGenerator starGenerator;
     public GameObject logs;
+    public GameObject compass;
+    public GameObject menu;
 
     private void Start()
     {
     }
     public void ToggleStars()
     {
-        starGenerator.ToggleStarVisibility();
+        StarGenerator.SG.ToggleStarVisibility();
     }
     public void ToggleLogs()
     {
         logs.SetActive(!logs.activeSelf);
+    }
+    public void ToggleCompass()
+    {
+        compass.SetActive(!compass.activeSelf);
+    }
+    public void ToggleMenu()
+    {
+        menu.SetActive(!menu.activeSelf);
     }
 }
