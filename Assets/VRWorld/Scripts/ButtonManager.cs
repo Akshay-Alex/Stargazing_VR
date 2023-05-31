@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class ButtonManager : MonoBehaviour
 {
     public GameObject logs;
@@ -10,7 +11,12 @@ public class ButtonManager : MonoBehaviour
 
     private void Start()
     {
+        //ShowAllCityNames();
+        //SearchCity();
+        //Debug.Log(cityData.Cities.Count);
     }
+    
+   
     public void ToggleStars()
     {
         StarGenerator.SG.ToggleStarVisibility();
