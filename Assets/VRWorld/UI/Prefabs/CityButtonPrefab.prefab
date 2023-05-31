@@ -92,10 +92,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
+  m_fontSize: 26.85
   m_fontSizeBase: 24
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -255,7 +255,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6266969207123017659}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1241194874339146952}
+        m_TargetAssemblyTypeName: CityButtonData, Assembly-CSharp
+        m_MethodName: DisplayCoordinates
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1241194874339146952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,6 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe9c707552467b4fbb7a01dabd7c096, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  locationManager: {fileID: 0}
   cityName: 
   Latitude: 
   Longitude: 

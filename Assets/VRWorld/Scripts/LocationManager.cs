@@ -11,7 +11,8 @@ public class LocationManager : MonoBehaviour
     public Transform scrollViewContentTransform;
     public GameObject buttonWithCityName;
     public TMP_InputField inputField;
-    public float buttonYOffset = -23.6f;
+    //public float buttonYOffset = -23.6f;
+    public List<GameObject> currentCityButtons = new List<GameObject>();
     void ShowAllCityNames()
     {
         foreach (CityData.City city in cityData.Cities)
@@ -31,12 +32,13 @@ public class LocationManager : MonoBehaviour
             }
             else
             {
-                int buttonPosition = 1;
+                DeleteOldCityButtons();
+                currentCityButtons.Clear();
                 foreach (CityData.City city in similarCities)
                 {
                     var currentCityButton = GameObject.Instantiate(buttonWithCityName, scrollViewContentTransform);
-                    CreateCityButton(currentCityButton,buttonPosition, city);
-                    buttonPosition++;
+                    CreateCityButton(currentCityButton, city);
+                    currentCityButtons.Add(currentCityButton);
                     //currentCityButton.GetComponent<RectTransform>().position
                     //Debug.Log("City Name " + city.Name + " City co ordinates " + city.Coordinates);
                 }
@@ -44,17 +46,30 @@ public class LocationManager : MonoBehaviour
         }
         
     }
-    void CreateCityButton(GameObject button, int buttonPosition,CityData.City cityData)
+    void DeleteOldCityButtons()
     {
-        var rectTransform = button.GetComponent<RectTransform>();
-        var CityBittonData = button.GetComponent<CityButtonData>();
-        rectTransform.rect.Set(0f, buttonYOffset + rectTransform.rect.width * buttonPosition, rectTransform.rect.width, rectTransform.rect.height);
+        foreach (GameObject button in currentCityButtons)
+        {
+            Destroy(button);
+        }
+    }
+    void CreateCityButton(GameObject button,CityData.City cityData)
+    {
+        var CityButtonData = button.GetComponent<CityButtonData>();
+        string[] Coordinates = cityData.Coordinates.Split(',');
+        CityButtonData.Latitude = Coordinates[0];
+        CityButtonData.Longitude = Coordinates[1];
+        CityButtonData.locationManager = this;
         button.GetComponentInChildren<TextMeshProUGUI>().text = cityData.Name;
     }
     void InitializeKeyboard()
     {
         NonNativeKeyboard.Instance.InputField = inputField;
         NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
+    }
+    public void DisplayCoordinatesOfCity(CityButtonData data)
+    {
+        Debug.Log("Latitude " + data.Latitude + " Longitude " + data.Longitude);
     }
     // Start is called before the first frame update
     void Start()
