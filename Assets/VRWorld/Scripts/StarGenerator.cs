@@ -7,8 +7,8 @@ using DG.Tweening;
 
 public class StarGenerator : MonoBehaviour
 {
-    public static StarGenerator SG;
-    public GPSService gPSService;
+    public static StarGenerator starGenerator;
+    //public GPSService gPSService;
     private float latitude, longitude;
     //prefab used to instantiate stars
     public GameObject StarPrefab;
@@ -50,18 +50,22 @@ public class StarGenerator : MonoBehaviour
     // this is because RA is in hours and to convert it to degrees 
     void Start()
     {
-        SG = this;
+        starGenerator = this;
         InitializeFlags();
         InitializeProperties();
-        FindJulianDate();
     }
    
     void Awake()
     {
 
 
-        GenerateAndPositionStars();
+        //GenerateAndPositionStars();
 
+    }
+    public void SetLatitudeAndLongitude(CityButtonData cityButtonData)
+    {
+        latitude = float.Parse(cityButtonData.Latitude);
+        longitude = float.Parse(cityButtonData.Longitude);
     }
     public void ToggleStarVisibility()
     {
@@ -75,11 +79,13 @@ public class StarGenerator : MonoBehaviour
   
     public void GenerateAndPositionStars()
     {
+        FindJulianDate();
         GenerateStars();
         PositionSiriusAtHorizon();
         //StartCoroutine(GetLocationData());
         //StartCoroutine(CalculateSiriusRealtimePosition());
     }
+    /*
     IEnumerator GetLocationData()
     {
         if(gPSService.locationWebRequestDone)
@@ -99,6 +105,7 @@ public class StarGenerator : MonoBehaviour
             StartCoroutine(GetLocationData());
         }
     }
+    */
     #region Functions to calculate realtime position
     IEnumerator CalculateSiriusRealtimePosition()
     {

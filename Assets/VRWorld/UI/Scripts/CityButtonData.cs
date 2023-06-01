@@ -8,8 +8,9 @@ public class CityButtonData : MonoBehaviour
     public string cityName;
     public string Latitude;
     public string Longitude;
-    public void DisplayCoordinates()
+    public void SelectCity()
     {
-        locationManager.DisplayCoordinatesOfCity(this);
+        locationManager.ShowConfirmDialogBox();
+        StarGenerator.starGenerator.SetLatitudeAndLongitude(this);
     }
 }

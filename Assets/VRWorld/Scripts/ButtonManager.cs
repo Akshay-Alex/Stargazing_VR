@@ -19,7 +19,7 @@ public class ButtonManager : MonoBehaviour
    
     public void ToggleStars()
     {
-        StarGenerator.SG.ToggleStarVisibility();
+        StarGenerator.starGenerator.ToggleStarVisibility();
     }
     public void ToggleLogs()
     {
