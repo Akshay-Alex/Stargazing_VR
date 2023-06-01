@@ -11,6 +11,9 @@ public class LocationManager : MonoBehaviour
     public Transform scrollViewContentTransform;
     public GameObject buttonWithCityName;
     public TMP_InputField inputField;
+    public GameObject scrollViewParentObject;
+    public GameObject confirmDialogBox;
+    public GameObject parentCanvas;
     //public float buttonYOffset = -23.6f;
     public List<GameObject> currentCityButtons = new List<GameObject>();
     void ShowAllCityNames()
@@ -20,9 +23,15 @@ public class LocationManager : MonoBehaviour
             Debug.Log(city.Name);
         }
     }
+    public void ConfirmCity()
+    {
+        StarGenerator.starGenerator.GenerateAndPositionStars();
+        parentCanvas.SetActive(false);
+        NonNativeKeyboard.Instance.gameObject.SetActive(false);
+    }
     public void SearchCity()
     {
-        Debug.Log("SearchCity called");
+        //Debug.Log("SearchCity called");
         if (inputField.text.Length > 2)
         {
             IEnumerable<CityData.City> similarCities = cityData.Cities.Where(city => city.AlternateName.Contains(inputField.text));
@@ -46,6 +55,16 @@ public class LocationManager : MonoBehaviour
         }
         
     }
+    public void ShowConfirmDialogBox()
+    {
+        scrollViewParentObject.SetActive(false);
+        confirmDialogBox.SetActive(true);
+    }
+    public void HideConfirmDialogBox()
+    {
+        scrollViewParentObject.SetActive(true);
+        confirmDialogBox.SetActive(false);
+    }
     void DeleteOldCityButtons()
     {
         foreach (GameObject button in currentCityButtons)
@@ -67,10 +86,12 @@ public class LocationManager : MonoBehaviour
         NonNativeKeyboard.Instance.InputField = inputField;
         NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
     }
+    /*
     public void DisplayCoordinatesOfCity(CityButtonData data)
     {
         Debug.Log("Latitude " + data.Latitude + " Longitude " + data.Longitude);
     }
+    */
     // Start is called before the first frame update
     void Start()
     {
