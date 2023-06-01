@@ -1,4 +1,4 @@
-<p><u><span style="font-size:72px">Stargazing VR</span></u></p>
+# Stargazing VR
 
 <ul>
 	<li><span style="font-size:28px">In this project a simulation of the nightsky is generated based on the user&#39;s location.</span></li>
