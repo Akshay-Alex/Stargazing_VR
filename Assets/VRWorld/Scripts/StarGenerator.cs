@@ -195,7 +195,7 @@ public class StarGenerator : MonoBehaviour
                 raInRadian = ra * 15.0d * degreeToRadianMultiplier;
 
 
-                SphericalToCartesian(raInRadian, decInRadian, r, ref x, ref y, ref z);
+                SphericalToCartesian(raInRadian, decInRadian, DistanceMultiplier, ref x, ref y, ref z);
                 normalizedPosition = new Vector3((float)x, (float)y, (float)z);
                 InstantiateStar(starNumber, mag, normalizedPosition);
 
