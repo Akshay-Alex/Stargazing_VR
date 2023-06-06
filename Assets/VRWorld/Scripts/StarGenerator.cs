@@ -4,17 +4,20 @@ using UnityEngine;
 using System;
 using UnityEngine.Networking;
 using DG.Tweening;
+using System.Threading.Tasks;
 
 public class StarGenerator : MonoBehaviour
 {
     public static StarGenerator starGenerator;
+    public StarData starData;
     //public GPSService gPSService;
     private float latitude, longitude;
     //prefab used to instantiate stars
     public GameObject StarPrefab;
     public GameObject StarParent;
+    public GameObject Compass;
     //flags
-    private bool starsGenerated, JulianDateWebRequestDone, locationDataFetched;
+    private bool starsGenerated, JulianDateWebRequestDone;
     public bool ShowTwoStars;
     //class used to parse json data
     [System.Serializable]
@@ -44,7 +47,7 @@ public class StarGenerator : MonoBehaviour
     public int maxParticles = 10000;
     private Vector3 normalizedPosition,siriusAtHorizonPosition;
     public float DistanceMultiplier;
-    double  degreeToRadianMultiplier = Math.PI/180d;
+    float  degreeToRadianMultiplier = (float)Math.PI/180;
     double r = 100.0f, mag, ra, dec, x, y, z, raInRadian, decInRadian;
     // whenever we use RA it can be seen multiplied with a factor of 15.
     // this is because RA is in hours and to convert it to degrees 
@@ -53,15 +56,9 @@ public class StarGenerator : MonoBehaviour
         starGenerator = this;
         InitializeFlags();
         InitializeProperties();
+        FindJulianDate();
     }
    
-    void Awake()
-    {
-
-
-        //GenerateAndPositionStars();
-
-    }
     public void SetLatitudeAndLongitude(CityButtonData cityButtonData)
     {
         latitude = float.Parse(cityButtonData.Latitude);
@@ -79,11 +76,13 @@ public class StarGenerator : MonoBehaviour
   
     public void GenerateAndPositionStars()
     {
-        FindJulianDate();
-        GenerateStars();
-        PositionSiriusAtHorizon();
-        //StartCoroutine(GetLocationData());
-        //StartCoroutine(CalculateSiriusRealtimePosition());
+        if(JulianDateWebRequestDone)
+        {
+            //GenerateStars();
+            //SphericalToCartesian(0f, 90f, 1,ref x,ref y,ref z);
+            //Debug.Log("x " + x + " y " + y + " z " + z);
+            StartCoroutine("GenerateStarsAtRealtimeLocation");
+        }    
     }
     /*
     IEnumerator GetLocationData()
@@ -107,6 +106,7 @@ public class StarGenerator : MonoBehaviour
     }
     */
     #region Functions to calculate realtime position
+    /*
     IEnumerator CalculateSiriusRealtimePosition()
     {
         if (JulianDateWebRequestDone == false)
@@ -131,10 +131,11 @@ public class StarGenerator : MonoBehaviour
         }
 
     }
+    */
     //!Do not touch this
     //Function working properly
     //reference website https://astrogreg.com/convert_ra_dec_to_alt_az.html
-    (double,double) RaDectoAltAz(double ra, double dec, double lat, double lon, double jd)
+    (float,float) RaDectoAltAz(float ra, float dec, float lat, float lon, double jd)
     {
         double gmst = greenwichMeanSiderealTime(jd);
         double localSiderealTime = (gmst + lon) % (2 * Math.PI);
@@ -151,7 +152,7 @@ public class StarGenerator : MonoBehaviour
         { az += 2 * Math.PI; }
         a /= degreeToRadianMultiplier;
         az /= degreeToRadianMultiplier;
-        return (a, az);
+        return ((float)a,(float)az);
     }
 
    
@@ -177,7 +178,7 @@ public class StarGenerator : MonoBehaviour
 
     #endregion
 
-
+    /*
     void GenerateStars()
     {
         if (starsGenerated == false)
@@ -207,21 +208,74 @@ public class StarGenerator : MonoBehaviour
             }
       
         }
+    }*/
+    /*
+    void GenerateStars()
+    {
+        if (starsGenerated == false)
+        {
+            starsGenerated = true;
+            //DataLines = StarDataDegreesAndRadians.text.Split('\n');
+            foreach (StarData.Star star in starData.stars)
+            {
+                SphericalToCartesian((double)star.rightAscensionInRadian, (double)star.declinationInRadian, DistanceMultiplier, ref x, ref y, ref z);
+                normalizedPosition = new Vector3((float)x, (float)y, (float)z);
+                InstantiateStar(star.starNumber, star.magnitude, normalizedPosition);
+
+                if (star.starNumber == 1)         //storing data of star sirius
+                {
+                    siriusStarInfo.RA = ra;
+                    siriusStarInfo.Declination = dec;
+                }
+            }        
+        }
     }
+    */
     void InstantiateStar(int starID,double magnitude,Vector3 position)
     {
         var star = Instantiate(StarPrefab, position, Quaternion.identity);
         star.transform.SetParent(StarParent.transform);
-        star.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.white * (5.0f - (float)(mag)));
+        star.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.white * (5.0f - (float)(magnitude)));
         star.gameObject.name = "star" + starID;
     }
-    void SphericalToCartesian(double ra, double dec, double r, ref double x, ref double y, ref double z)
-    {   
-        dec = (Mathf.PI / 2) - dec;
-        var rr = r * Math.Sin(dec);
-        z = rr * Math.Cos(ra);
-        x = rr * Math.Sin(ra);
-        y = r * Math.Cos(dec);
+   
+    void SphericalToCartesian(float azimuth, float altitude, double r, ref double x, ref double y, ref double z)
+    {
+        float azimuthInRadian = azimuth * degreeToRadianMultiplier;
+        float altitudeInRadian = altitude * degreeToRadianMultiplier;
+        altitudeInRadian = (Mathf.PI / 2) - altitudeInRadian;           //Spherical to cartesian is calculated from y axis, but altitude is calculated from x or z, so we subtract from 90 to get the angle
+        //dec = (Mathf.PI / 2) - dec;
+        x = r * Math.Sin(altitudeInRadian) * Math.Cos(azimuthInRadian);
+        y = r * Math.Sin(altitudeInRadian) * Math.Sin(azimuthInRadian);
+        z = r * Math.Cos(altitudeInRadian);
+    }
+
+    /*
+   void SphericalToCartesian(float ra, float dec, double r, ref double x, ref double y, ref double z)
+   {   
+       dec = (Mathf.PI / 2) - dec;
+       var rr = r * Math.Sin(dec);
+       z = rr * Math.Cos(ra);
+       x = rr * Math.Sin(ra);
+       y = r * Math.Cos(dec);
+   }
+   */
+    IEnumerator GenerateStarsAtRealtimeLocation()
+    {
+        if (starsGenerated == false)
+        {
+            
+            //DataLines = StarDataDegreesAndRadians.text.Split('\n');
+            foreach (StarData.Star star in starData.stars)
+            {
+                (star.altitude,star.azimuth) = RaDectoAltAz(star.rightAscensionInRadian, star.declinationInRadian, latitude * degreeToRadianMultiplier, longitude * degreeToRadianMultiplier, julianDate);
+                SphericalToCartesian(star.azimuth, star.altitude, DistanceMultiplier, ref x, ref y, ref z);
+                normalizedPosition = new Vector3((float)x, (float)y, (float)z);
+                InstantiateStar(star.starNumber, star.magnitude, normalizedPosition);
+            }
+        }
+        starsGenerated = true;
+        return null;
     }
     #region Julian Date calculation
     void FindJulianDate()
@@ -237,6 +291,20 @@ public class StarGenerator : MonoBehaviour
         {
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
+            if(webRequest.result == UnityWebRequest.Result.Success)
+            {
+                string jsonString = webRequest.downloadHandler.text;
+                julianDateData = JsonUtility.FromJson<JulianDateData>(jsonString);
+                julianDate = Convert.ToDouble(julianDateData.jd);
+                JulianDateWebRequestDone = true;
+                Debug.Log("Julian Date found "+ julianDate);
+            }
+            else
+            {
+                Debug.Log("Web request error " + webRequest.result);
+            }
+
+            /*
             JulianDateWebRequestDone = true;
             string[] pages = uri.Split('/');
             int page = pages.Length - 1;
@@ -259,7 +327,8 @@ public class StarGenerator : MonoBehaviour
                     StartCoroutine(CalculateSiriusRealtimePosition());
                     yield return null;
                     break;
-            }
+            }*/
+
         }
     }
     #endregion
@@ -269,7 +338,6 @@ public class StarGenerator : MonoBehaviour
     {
         JulianDateWebRequestDone = false;
         starsGenerated = false;
-        locationDataFetched = false;
     }
     void InitializeProperties()
     {
@@ -279,20 +347,25 @@ public class StarGenerator : MonoBehaviour
         latitude = 0f;
         longitude = 0f;
     }
+    /*
     void PositionSiriusAtHorizon()
     {
         ReferenceStarData = DataLines[1].Split(',');
         referenceStarDecDegree = double.Parse(ReferenceStarData[1]);
         referenceStarRaDegree = double.Parse(ReferenceStarData[2]) * 15d;  //ra is expressed in hours, need to convert to degree.
-        StarParent.transform.eulerAngles = new Vector3(0f, -((float)referenceStarRaDegree), -((float)referenceStarDecDegree));
+        StarParent.transform.DOLocalRotate(new Vector3(((float)referenceStarDecDegree), ((float)referenceStarRaDegree),0f ), .00000001f);
+        //StarParent.transform.eulerAngles = new Vector3(0f, -((float)referenceStarRaDegree), -((float)referenceStarDecDegree));
         siriusAtHorizonPosition = StarParent.transform.eulerAngles;
+        Debug.Log("Positioned sirius at horizon");
     }
     void PositionSiriusAtRealtimePosition(double localAltitude, double localAzimuth)
     {
-        Vector3 offsetVector = new Vector3(0f, (float)localAzimuth, (float)localAltitude);
+        Vector3 offsetVector = new Vector3(-(float)localAltitude, (float)localAzimuth,0f);
         Vector3 newPositionOfSirius = siriusAtHorizonPosition + offsetVector;
         //StarParent.transform.eulerAngles += offsetVector;
-        StarParent.transform.DORotate(newPositionOfSirius, 1f);
+        StarParent.transform.DOLocalRotate(newPositionOfSirius, 0.1f);
+        Debug.Log("PositionSiriusAtRealtimePosition offset vector " + offsetVector + " newPositionOfSirius "+ newPositionOfSirius + " localAltitude "+ localAltitude + " localAzimuth "+ localAzimuth);
     }
+    */
     #endregion
 }
