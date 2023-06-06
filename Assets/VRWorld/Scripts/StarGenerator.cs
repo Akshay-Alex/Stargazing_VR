@@ -244,10 +244,10 @@ public class StarGenerator : MonoBehaviour
         float azimuthInRadian = azimuth * degreeToRadianMultiplier;
         float altitudeInRadian = altitude * degreeToRadianMultiplier;
         altitudeInRadian = (Mathf.PI / 2) - altitudeInRadian;           //Spherical to cartesian is calculated from y axis, but altitude is calculated from x or z, so we subtract from 90 to get the angle
-        //dec = (Mathf.PI / 2) - dec;
-        x = r * Math.Sin(altitudeInRadian) * Math.Cos(azimuthInRadian); //x is north
-        z = -( r * Math.Sin(altitudeInRadian) * Math.Sin(azimuthInRadian));
-        y = r * Math.Cos(altitudeInRadian);
+        //dec = (Mathf.PI / 2) - dec;//x y z in cartesian is completely different from xyz in unity y
+        x = r * Math.Sin(altitudeInRadian) * Math.Cos(azimuthInRadian); //x in cartesian = x in unity
+        z = -( r * Math.Sin(altitudeInRadian) * Math.Sin(azimuthInRadian));//y in cartesian = -z in unity
+        y = r * Math.Cos(altitudeInRadian);//z in cartesian = y in unity
     }
 
     /*
