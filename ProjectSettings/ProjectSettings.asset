@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: Yahska Productions
-  productName: Stargazer
+  companyName: Akshay Inc
+  productName: Stargaze & Chill
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -40,7 +40,7 @@ PlayerSettings:
     width: 1
     height: 1
   m_SplashScreenLogos: []
-  m_VirtualRealitySplashScreen: {fileID: 2800000, guid: 4f1dd4239c8c61e4bb224759efff9d9d, type: 3}
+  m_VirtualRealitySplashScreen: {fileID: 2800000, guid: f1e723c33418ab54eb3e9d7fc9423e4d, type: 3}
   m_HolographicTrackingLossScreen: {fileID: 0}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
@@ -156,7 +156,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.YahskaProductions.Stargazer
+    Android: com.AkshayInc.StargazeChill
     Standalone: com.DefaultCompany.VRWorld
   buildNumber:
     Standalone: 0
