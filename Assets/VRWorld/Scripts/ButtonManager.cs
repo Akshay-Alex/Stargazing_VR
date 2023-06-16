@@ -33,4 +33,8 @@ public class ButtonManager : MonoBehaviour
     {
         menu.SetActive(!menu.activeSelf);
     }
+    public void QuitApp()
+    {
+        Application.Quit();
+    }
 }
