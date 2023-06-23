@@ -2065,6 +2065,7 @@ GameObject:
   m_Component:
   - component: {fileID: 679618577}
   - component: {fileID: 679618578}
+  - component: {fileID: 679618579}
   m_Layer: 0
   m_Name: StarsParent
   m_TagString: Untagged
@@ -2098,6 +2099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e8d7601e42b56a4fbbeaa5e1729b13d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stars: []
   starData: {fileID: 11400000, guid: 4cf578ec5d1cf1c419b3a675a10c1e52, type: 2}
   StarPrefab: {fileID: 1889762957360050728, guid: 6d5a9f9b7eaf2ac46a5c0ee666a4fd44, type: 3}
   StarParent: {fileID: 679618576}
@@ -2108,9 +2110,24 @@ MonoBehaviour:
   julianDate: 0
   referenceStarDecDegree: 0
   referenceStarRaDegree: 0
+  timer: {fileID: 679618579}
   StarDataDegreesAndRadians: {fileID: 4900000, guid: f1f8f8914c100ed4189a677d42466e02, type: 3}
   maxParticles: 10000
   DistanceMultiplier: 1000
+--- !u!114 &679618579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 679618576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8dafc897af207a43a6ce511bb691257, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeRemaining: 0
+  timerRunning: 0
 --- !u!1 &692147007
 GameObject:
   m_ObjectHideFlags: 0

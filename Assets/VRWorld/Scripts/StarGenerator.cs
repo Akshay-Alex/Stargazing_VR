@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 public class StarGenerator : MonoBehaviour
 {
+    public List<GameObject> stars;
     public static StarGenerator starGenerator;
     public StarData starData;
     //public GPSService gPSService;
@@ -33,6 +34,7 @@ public class StarGenerator : MonoBehaviour
     private StarInfo siriusStarInfo = new StarInfo();
 
     public double azimuth, altitude, julianDate, referenceStarDecDegree, referenceStarRaDegree;
+    public Timer timer;
 
     //properties
 
@@ -82,7 +84,11 @@ public class StarGenerator : MonoBehaviour
             //SphericalToCartesian(0f, 90f, 1,ref x,ref y,ref z);
             //Debug.Log("x " + x + " y " + y + " z " + z);
             StartCoroutine("GenerateStarsAtRealtimeLocation");
-        }    
+        }
+        else
+        {
+            Debug.Log("Network error, no response from web request");
+        }
     }
     /*
     IEnumerator GetLocationData()
@@ -154,8 +160,36 @@ public class StarGenerator : MonoBehaviour
         az /= degreeToRadianMultiplier;
         return ((float)a,(float)az);
     }
-
-   
+    public void StartTimerForUpdatingStarPosition()
+    {
+        timer.TimerFinished += UpdateStarPosition;
+        FindJulianDate();
+        timer.SetTimer(60f);
+    }
+    void UpdateStarPosition()
+    {
+        //Debug.Log("UpdateStarPosition called");
+        StartCoroutine("MoveStarsToRealtimePosition");
+        timer.SetTimer(60f);
+        FindJulianDate();
+    }
+    IEnumerator MoveStarsToRealtimePosition()
+    {
+            foreach (StarData.Star star in starData.stars)
+            {
+                (star.altitude, star.azimuth) = RaDectoAltAz(star.rightAscensionInRadian, star.declinationInRadian, latitude * degreeToRadianMultiplier, longitude * degreeToRadianMultiplier, julianDate);
+                SphericalToCartesian(star.azimuth, star.altitude, DistanceMultiplier, ref x, ref y, ref z);
+                normalizedPosition = new Vector3((float)x, (float)y, (float)z);
+                MoveStar(star.starNumber, normalizedPosition);
+            }
+        
+        starsGenerated = true;
+        return null;
+    }
+    void MoveStar(int StarID, Vector3 position)
+    {
+        stars[StarID].transform.DOMove(position, 1f);
+    }
     double EarthRotationAngle(double jd)
     {
         double t = jd - 2451545.0;
@@ -237,6 +271,8 @@ public class StarGenerator : MonoBehaviour
         star.transform.SetParent(StarParent.transform);
         star.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.white * (5.0f - (float)(magnitude)));
         star.gameObject.name = "star" + starID;
+        stars.Insert(starID, star);
+        //stars[starID] = star;
     }
    
     void SphericalToCartesian(float azimuth, float altitude, double r, ref double x, ref double y, ref double z)
