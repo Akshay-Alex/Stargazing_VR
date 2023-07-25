@@ -7,13 +7,14 @@ using UnityEngine.XR;
 
 public class GestureDetection : MonoBehaviour
 {
-    public UnityEvent LeftTriggerPressed, LeftTriggerReleased, RightTriggerPressed,RightTriggerReleased;
-    InputFeatureUsage<bool> triggerPressFeature = CommonUsages.triggerButton;
+    public UnityEvent LeftGripPressed, LeftGripReleased, RightGripPressed,RightGripReleased;
+    public Transform leftControllerReference, rightControllerReference;
+    InputFeatureUsage<bool> gripPressFeature = CommonUsages.gripButton;
     InputDeviceCharacteristics leftControllerCharacterisitic;
     InputDeviceCharacteristics rightControllerCharacterisitic;
     List<InputDevice> leftControllers;
     List<InputDevice> rightControllers;
-    bool isLeftTriggerPressed, isRightTriggerPressed, leftTriggerOutValue, rightTriggerOutValue;
+    bool isLeftGripPressed, isRightGripPressed, leftGripOutValue, rightGripOutValue;
     public static GestureDetection gestureDetection;
     // Start is called before the first frame update
     void Start()
@@ -27,69 +28,73 @@ public class GestureDetection : MonoBehaviour
     }
     void TestEvents()
     {
-        LeftTriggerPressed.AddListener(OnLeftTriggerPressed);
-        RightTriggerPressed.AddListener(OnRightTriggerPressed);
-        LeftTriggerReleased.AddListener(OnLeftTriggerReleased);
-        RightTriggerReleased.AddListener(OnRightTriggerReleased);
+        LeftGripPressed.AddListener(OnLeftGripPressed);
+        RightGripPressed.AddListener(OnRightGripPressed);
+        LeftGripReleased.AddListener(OnLeftGripReleased);
+        RightGripReleased.AddListener(OnRightGripReleased);
     }
-    void OnLeftTriggerPressed()
+    void OnLeftGripPressed()
     {
-        Debug.Log(" OnLeftTriggerPressed ");
+        Debug.Log(" OnLeftGripPressed ");
+        Debug.Log("Left :" + leftControllerReference.localPosition);
     }
-    void OnRightTriggerPressed()
+    void OnRightGripPressed()
     {
-        Debug.Log(" OnRightTriggerPressed ");
+        Debug.Log(" OnRightGripPressed ");
+        Debug.Log("Right :" + rightControllerReference.localPosition);
     }
-    void OnLeftTriggerReleased()
+    void OnLeftGripReleased()
     {
-        Debug.Log(" OnLeftTriggerReleased ");
+        Debug.Log(" OnLeftGripReleased ");
+        Debug.Log("Left :" + leftControllerReference.localPosition);
     }
-    void OnRightTriggerReleased()
+    void OnRightGripReleased()
     {
-        Debug.Log(" OnRightTriggerReleased ");
+        Debug.Log(" OnRightGripReleased ");
+        Debug.Log("Right :" + rightControllerReference.localPosition);
     }
     // Update is called once per frame
     void Update()
     {
-        CheckLeftTrigger();
-        CheckRightTrigger();
+        CheckLeftGrip();
+        CheckRightGrip();
 
 
 
     }
-    void CheckLeftTrigger()
+    void CheckLeftGrip()
     {
         InputDevices.GetDevicesWithCharacteristics(leftControllerCharacterisitic, leftControllers);
         for (int index = 0; index < leftControllers.Count; index++)
         {
-            leftControllers[index].TryGetFeatureValue(triggerPressFeature, out leftTriggerOutValue);
-            if (leftTriggerOutValue == true && isLeftTriggerPressed == false)
+            leftControllers[index].TryGetFeatureValue(gripPressFeature, out leftGripOutValue);
+            if (leftGripOutValue == true && isLeftGripPressed == false)
             {
-                isLeftTriggerPressed = true;
-                LeftTriggerPressed.Invoke();
+                isLeftGripPressed = true;
+                LeftGripPressed.Invoke();
             }
-            else if (leftTriggerOutValue == false && isLeftTriggerPressed == true)
+            else if (leftGripOutValue == false && isLeftGripPressed == true)
             {
-                isLeftTriggerPressed = false;
-                LeftTriggerReleased.Invoke();
+                isLeftGripPressed = false;
+                LeftGripReleased.Invoke();
             }
         }
     }
-    void CheckRightTrigger()
+    void CheckRightGrip()
     {
         InputDevices.GetDevicesWithCharacteristics(rightControllerCharacterisitic, rightControllers);
         for (int index = 0; index < rightControllers.Count; index++)
         {
-            rightControllers[index].TryGetFeatureValue(triggerPressFeature, out rightTriggerOutValue);
-            if (rightTriggerOutValue == true && isRightTriggerPressed == false)
+            rightControllers[index].TryGetFeatureValue(gripPressFeature, out rightGripOutValue);
+            if (rightGripOutValue == true && isRightGripPressed == false)
             {
-                isRightTriggerPressed = true;
-                RightTriggerPressed.Invoke();
+                isRightGripPressed = true;
+                RightGripPressed.Invoke();
             }
-            else if (rightTriggerOutValue == false && isRightTriggerPressed == true)
+            else if (rightGripOutValue == false && isRightGripPressed == true)
             {
-                isRightTriggerPressed = false;
-                RightTriggerReleased.Invoke();
+                isRightGripPressed = false;
+                RightGripReleased.Invoke();
             }
         }
     }
