@@ -8,18 +8,25 @@ using UnityEngine.XR;
 public class GestureDetection : MonoBehaviour
 {
     public UnityEvent LeftGripPressed, LeftGripReleased, RightGripPressed,RightGripReleased;
-    public Transform leftControllerReference, rightControllerReference;
+    public Transform leftControllerReference, rightControllerReference, cameraReference;
     InputFeatureUsage<bool> gripPressFeature = CommonUsages.gripButton;
     InputDeviceCharacteristics leftControllerCharacterisitic;
     InputDeviceCharacteristics rightControllerCharacterisitic;
     List<InputDevice> leftControllers;
     List<InputDevice> rightControllers;
-    bool isLeftGripPressed, isRightGripPressed, leftGripOutValue, rightGripOutValue;
+    bool isLeftGripPressed, isRightGripPressed, leftGripOutValue, rightGripOutValue,isLeftController,buttonHeldDown;
     public static GestureDetection gestureDetection;
+    Vector3 leftRightAxis, startPosition, endPosition,controllerMovementVector, currentControllerMovementVector;
+    public LineRenderer ControllerAxisLine;
+    double timeInSeconds, deltaValue;
+    DateTime startTime;
+    public bool _debug;
     // Start is called before the first frame update
     void Start()
     {
         gestureDetection = this;
+        isLeftController = false;
+        buttonHeldDown = false;
         leftControllerCharacterisitic = InputDeviceCharacteristics.Left;
         rightControllerCharacterisitic = InputDeviceCharacteristics.Right;
         leftControllers = new List<InputDevice>();
@@ -35,32 +42,63 @@ public class GestureDetection : MonoBehaviour
     }
     void OnLeftGripPressed()
     {
-        Debug.Log(" OnLeftGripPressed ");
-        Debug.Log("Left :" + leftControllerReference.localPosition);
+        isLeftController = true;
+        buttonHeldDown = true;
+        startPosition = leftControllerReference.position;
+        startTime = DateTime.Now;
     }
     void OnRightGripPressed()
     {
-        Debug.Log(" OnRightGripPressed ");
-        Debug.Log("Right :" + rightControllerReference.localPosition);
+        isLeftController = false;
+        buttonHeldDown = true;
+        startPosition = rightControllerReference.position;
+        startTime = DateTime.Now;
     }
     void OnLeftGripReleased()
     {
-        Debug.Log(" OnLeftGripReleased ");
-        Debug.Log("Left :" + leftControllerReference.localPosition);
+        if(isLeftController)
+        {
+            buttonHeldDown = false;
+        }
     }
     void OnRightGripReleased()
     {
-        Debug.Log(" OnRightGripReleased ");
-        Debug.Log("Right :" + rightControllerReference.localPosition);
+        if (!isLeftController)
+        {
+            buttonHeldDown = false;
+        }
     }
     // Update is called once per frame
     void Update()
     {
         CheckLeftGrip();
         CheckRightGrip();
-
-
-
+    }
+    private void FixedUpdate()
+    {
+        if (buttonHeldDown)
+        {
+            leftRightAxis = Vector3.Cross(Vector3.up, cameraReference.forward);
+            if (isLeftController)
+            {
+                endPosition = leftControllerReference.position;
+                //currentControllerMovementVector = startPosition - leftControllerReference.position;             
+            }
+            else
+            {
+                endPosition = rightControllerReference.position;
+                //currentControllerMovementVector = startPosition - rightControllerReference.position;
+            }
+            currentControllerMovementVector = startPosition - endPosition;
+            timeInSeconds = (startTime - DateTime.Now).TotalSeconds;
+            deltaValue = Vector3.Dot(currentControllerMovementVector, leftRightAxis) * (1/timeInSeconds);
+            if (_debug)
+            {
+                Debug.Log("Delta Value : " + deltaValue);
+                ControllerAxisLine.SetPosition(0, startPosition);
+                ControllerAxisLine.SetPosition(1, endPosition);
+            }
+        }
     }
     void CheckLeftGrip()
     {
