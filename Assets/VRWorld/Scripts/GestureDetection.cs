@@ -7,14 +7,15 @@ using UnityEngine.XR;
 
 public class GestureDetection : MonoBehaviour
 {
-    public UnityEvent LeftGripPressed, LeftGripReleased, RightGripPressed,RightGripReleased;
+    public UnityEvent LeftGripPressed, LeftGripReleased, RightGripPressed,RightGripReleased,LeftSecondaryButtonPressed,RightSecondaryButtonPressed;
     public Transform leftControllerReference, rightControllerReference, cameraReference;
     InputFeatureUsage<bool> gripPressFeature = CommonUsages.gripButton;
+    InputFeatureUsage<bool> secondaryButtonFeature = CommonUsages.secondaryButton;
     InputDeviceCharacteristics leftControllerCharacterisitic;
     InputDeviceCharacteristics rightControllerCharacterisitic;
     List<InputDevice> leftControllers;
     List<InputDevice> rightControllers;
-    bool isLeftGripPressed, isRightGripPressed, leftGripOutValue, rightGripOutValue,isLeftController,buttonHeldDown;
+    bool isLeftGripPressed, isRightGripPressed, leftGripOutValue, rightGripOutValue,isLeftController,buttonHeldDown,leftSecondaryOutValue,rightSecondaryOutValue;
     public static GestureDetection gestureDetection;
     Vector3 leftRightAxis, startPosition, endPosition,controllerMovementVector, currentControllerMovementVector;
     public LineRenderer ControllerAxisLine;
@@ -73,6 +74,7 @@ public class GestureDetection : MonoBehaviour
     {
         CheckLeftGrip();
         CheckRightGrip();
+        CheckSecondaryButtonPress();
     }
     private void FixedUpdate()
     {
@@ -117,6 +119,28 @@ public class GestureDetection : MonoBehaviour
                 LeftGripReleased.Invoke();
             }
         }
+    }
+    void CheckSecondaryButtonPress()
+    {
+        InputDevices.GetDevicesWithCharacteristics(leftControllerCharacterisitic, leftControllers);
+        InputDevices.GetDevicesWithCharacteristics(rightControllerCharacterisitic, rightControllers);
+        for (int index = 0; index < rightControllers.Count; index++)
+        {
+            rightControllers[index].TryGetFeatureValue(secondaryButtonFeature, out rightSecondaryOutValue);
+            if (rightSecondaryOutValue == true)
+            {
+                RightSecondaryButtonPressed.Invoke();
+            }
+        }
+        for (int index = 0; index < leftControllers.Count; index++)
+        {
+            leftControllers[index].TryGetFeatureValue(secondaryButtonFeature, out leftSecondaryOutValue);
+            if (leftSecondaryOutValue == true)
+            {
+                LeftSecondaryButtonPressed.Invoke();
+            }
+        }
+
     }
     void CheckRightGrip()
     {
