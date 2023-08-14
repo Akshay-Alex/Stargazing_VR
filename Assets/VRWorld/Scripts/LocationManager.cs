@@ -26,7 +26,7 @@ public class LocationManager : MonoBehaviour
     public void ConfirmCity()
     {
         StarGenerator.starGenerator.GenerateAndPositionStars();
-        StarGenerator.starGenerator.StartTimerForUpdatingStarPosition();
+        //StarGenerator.starGenerator.StartTimerForUpdatingStarPosition();
         parentCanvas.SetActive(false);
         NonNativeKeyboard.Instance.gameObject.SetActive(false);
     }

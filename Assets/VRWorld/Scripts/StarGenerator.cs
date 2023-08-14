@@ -32,6 +32,7 @@ public class StarGenerator : MonoBehaviour
         public double RA, Declination; //data is stored in degrees
     }
     private StarInfo siriusStarInfo = new StarInfo();
+    private DateTime currentGameTime;
 
     public double azimuth, altitude, julianDate, referenceStarDecDegree, referenceStarRaDegree;
     public Timer timer;
@@ -58,7 +59,8 @@ public class StarGenerator : MonoBehaviour
         starGenerator = this;
         InitializeFlags();
         InitializeProperties();
-        FindJulianDate();
+        DateTime TimeInUTC = DateTime.Now.ToUniversalTime();
+        FindJulianDate(TimeInUTC);
     }
    
     public void SetLatitudeAndLongitude(CityButtonData cityButtonData)
@@ -78,17 +80,7 @@ public class StarGenerator : MonoBehaviour
   
     public void GenerateAndPositionStars()
     {
-        if(JulianDateWebRequestDone)
-        {
-            //GenerateStars();
-            //SphericalToCartesian(0f, 90f, 1,ref x,ref y,ref z);
-            //Debug.Log("x " + x + " y " + y + " z " + z);
             StartCoroutine("GenerateStarsAtRealtimeLocation");
-        }
-        else
-        {
-            Debug.Log("Network error, no response from web request");
-        }
     }
     /*
     IEnumerator GetLocationData()
@@ -160,18 +152,20 @@ public class StarGenerator : MonoBehaviour
         az /= degreeToRadianMultiplier;
         return ((float)a,(float)az);
     }
+    /*
     public void StartTimerForUpdatingStarPosition()
     {
         timer.TimerFinished += UpdateStarPosition;
         FindJulianDate();
         timer.SetTimer(60f);
     }
-    void UpdateStarPosition()
+*/
+    void UpdateStarPosition(int timeToChangeInHours)
     {
-        //Debug.Log("UpdateStarPosition called");
+        currentGameTime = currentGameTime.AddHours(timeToChangeInHours);
+        FindJulianDate(currentGameTime);
         StartCoroutine("MoveStarsToRealtimePosition");
-        timer.SetTimer(60f);
-        FindJulianDate();
+        
     }
     IEnumerator MoveStarsToRealtimePosition()
     {
@@ -314,13 +308,20 @@ public class StarGenerator : MonoBehaviour
         return null;
     }
     #region Julian Date calculation
-    void FindJulianDate()
+    void FindJulianDate(DateTime currentDate)
     {
-        DateTime TimeInUTC = DateTime.Now.ToUniversalTime();
+            julianDate = currentDate.ToOADate() + 2415018.5;
+    }
+    /*
+    void FindJulianDate(DateTime currentTime)
+    {
+        currentGameTime = currentTime;
         //DateTime TimeInUTC = new DateTime(2023, 01, 19, 12, 00, 00); //today noon
-        string request = String.Format("https://ssd-api.jpl.nasa.gov/jd_cal.api?cd={0}-{1}-{2}%20{3}", TimeInUTC.Year, TimeInUTC.Month, TimeInUTC.Day, TimeInUTC.ToString("HH:mm"));
+        string request = String.Format("https://ssd-api.jpl.nasa.gov/jd_cal.api?cd={0}-{1}-{2}%20{3}", currentTime.Year, currentTime.Month, currentTime.Day, currentTime.ToString("HH:mm"));
         StartCoroutine(SendRequestForJulianDate(request));
     }
+    */
+    /*
     IEnumerator SendRequestForJulianDate(string uri)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
@@ -363,10 +364,11 @@ public class StarGenerator : MonoBehaviour
                     StartCoroutine(CalculateSiriusRealtimePosition());
                     yield return null;
                     break;
-            }*/
+            }
 
         }
     }
+    */
     #endregion
 
     #region Initialization functions
