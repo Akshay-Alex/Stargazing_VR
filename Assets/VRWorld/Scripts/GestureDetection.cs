@@ -21,6 +21,8 @@ public class GestureDetection : MonoBehaviour
     public LineRenderer ControllerAxisLine;
     double timeInSeconds, deltaValue;
     DateTime startTime;
+    float lastLeftSecondaryPressTime, lastRightSecondaryPressTime;
+    public float debounceTime;
     public bool _debug;
     // Start is called before the first frame update
     void Start()
@@ -32,7 +34,33 @@ public class GestureDetection : MonoBehaviour
         rightControllerCharacterisitic = InputDeviceCharacteristics.Right;
         leftControllers = new List<InputDevice>();
         rightControllers = new List<InputDevice>();
+        SetDebounceTime();
         TestEvents();
+    }
+    void SetDebounceTime()
+    {
+        lastLeftSecondaryPressTime = Time.time;
+        lastRightSecondaryPressTime = Time.time;
+    }
+    bool CheckIfButtonPressValid(bool isLeft)
+    {
+        if(isLeft)
+        {
+            if (Time.time - lastLeftSecondaryPressTime > debounceTime)
+            {
+                lastLeftSecondaryPressTime = Time.time;
+                return true;
+            }
+        }
+        else
+        {
+            if (Time.time - lastRightSecondaryPressTime > debounceTime)
+            {
+                lastRightSecondaryPressTime = Time.time;
+                return true;
+            }        
+        }
+        return false;
     }
     void TestEvents()
     {
@@ -127,17 +155,25 @@ public class GestureDetection : MonoBehaviour
         for (int index = 0; index < rightControllers.Count; index++)
         {
             rightControllers[index].TryGetFeatureValue(secondaryButtonFeature, out rightSecondaryOutValue);
-            if (rightSecondaryOutValue == true)
+            if (rightSecondaryOutValue == true && CheckIfButtonPressValid(false))
             {
                 RightSecondaryButtonPressed.Invoke();
+                if(_debug)
+                {
+                    Debug.Log("Right secondary button pressed");
+                }
             }
         }
         for (int index = 0; index < leftControllers.Count; index++)
         {
             leftControllers[index].TryGetFeatureValue(secondaryButtonFeature, out leftSecondaryOutValue);
-            if (leftSecondaryOutValue == true)
+            if (leftSecondaryOutValue == true && CheckIfButtonPressValid(true))
             {
                 LeftSecondaryButtonPressed.Invoke();
+                if (_debug)
+                {
+                    Debug.Log("Left secondary button pressed");
+                }
             }
         }
 

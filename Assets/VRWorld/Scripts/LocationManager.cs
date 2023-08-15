@@ -14,6 +14,14 @@ public class LocationManager : MonoBehaviour
     public GameObject scrollViewParentObject;
     public GameObject confirmDialogBox;
     public GameObject parentCanvas;
+    public bool _debug;
+    public enum TimeScale
+    {
+        hours,
+        days,
+        months
+    }
+    public TimeScale timeScale;
     //public float buttonYOffset = -23.6f;
     public List<GameObject> currentCityButtons = new List<GameObject>();
     void ShowAllCityNames()
@@ -29,6 +37,10 @@ public class LocationManager : MonoBehaviour
         //StarGenerator.starGenerator.StartTimerForUpdatingStarPosition();
         parentCanvas.SetActive(false);
         NonNativeKeyboard.Instance.gameObject.SetActive(false);
+        if(_debug)
+        {
+            Debug.Log("City confirmed");
+        }
     }
     public void SearchCity()
     {
@@ -54,7 +66,10 @@ public class LocationManager : MonoBehaviour
                 }
             }
         }
-        
+        if (_debug)
+        {
+            Debug.Log("Search city function called");
+        }
     }
     public void ShowConfirmDialogBox()
     {
@@ -87,6 +102,30 @@ public class LocationManager : MonoBehaviour
         NonNativeKeyboard.Instance.InputField = inputField;
         NonNativeKeyboard.Instance.PresentKeyboard(inputField.text);
     }
+    public void ChangeTimeScale()
+    {
+        int newTimeScale = ((int)timeScale + 1) % 3;
+        timeScale =(TimeScale) newTimeScale;
+        if (_debug)
+        {
+            Debug.Log("Timescale changed to " + timeScale);
+        }
+        
+    }
+    void SubscribeToGestureEvent()
+    {
+        GestureDetection.gestureDetection.LeftSecondaryButtonPressed.AddListener(ChangeTimeScale);
+        GestureDetection.gestureDetection.RightSecondaryButtonPressed.AddListener(ChangeTimeScale);
+    }
+    void UnSubscribeToGestureEvent()
+    {
+        GestureDetection.gestureDetection.LeftSecondaryButtonPressed.RemoveAllListeners();
+        GestureDetection.gestureDetection.RightSecondaryButtonPressed.RemoveAllListeners();
+    }
+    void OnDestroy()
+    {
+        UnSubscribeToGestureEvent();
+    }
     /*
     public void DisplayCoordinatesOfCity(CityButtonData data)
     {
@@ -97,6 +136,8 @@ public class LocationManager : MonoBehaviour
     void Start()
     {
         InitializeKeyboard();
+        timeScale = TimeScale.hours;
+        SubscribeToGestureEvent();
     }
 
     // Update is called once per frame
