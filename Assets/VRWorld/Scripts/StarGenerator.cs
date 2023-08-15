@@ -56,10 +56,12 @@ public class StarGenerator : MonoBehaviour
     // this is because RA is in hours and to convert it to degrees 
     void Start()
     {
+        DOTween.SetTweensCapacity(25000, 50);
         starGenerator = this;
         InitializeFlags();
         InitializeProperties();
         DateTime TimeInUTC = DateTime.Now.ToUniversalTime();
+        currentGameTime = TimeInUTC;
         FindJulianDate(TimeInUTC);
     }
    
@@ -160,7 +162,7 @@ public class StarGenerator : MonoBehaviour
         timer.SetTimer(60f);
     }
 */
-    void UpdateStarPosition(int timeToChangeInHours)
+    public void UpdateStarPosition(int timeToChangeInHours)
     {
         currentGameTime = currentGameTime.AddHours(timeToChangeInHours);
         FindJulianDate(currentGameTime);

@@ -15,11 +15,12 @@ public class LocationManager : MonoBehaviour
     public GameObject confirmDialogBox;
     public GameObject parentCanvas;
     public bool _debug;
+    public float deltaValueMultiplier;
     public enum TimeScale
     {
         hours,
         days,
-        months
+        weeks
     }
     public TimeScale timeScale;
     //public float buttonYOffset = -23.6f;
@@ -122,9 +123,33 @@ public class LocationManager : MonoBehaviour
         GestureDetection.gestureDetection.LeftSecondaryButtonPressed.RemoveAllListeners();
         GestureDetection.gestureDetection.RightSecondaryButtonPressed.RemoveAllListeners();
     }
+    void ChangeGameTime()
+    {
+        int hoursToAdd = 0;
+        switch(timeScale)
+        {
+            case TimeScale.hours:
+                hoursToAdd =(int) Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue));
+                break;
+            case TimeScale.days:
+                hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue * 24));
+                break;
+            case TimeScale.weeks:
+                hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue * 168));
+                break;
+            default:
+                break;
+        }
+        StarGenerator.starGenerator.UpdateStarPosition(hoursToAdd);
+        if(_debug)
+        {
+            Debug.Log("Adding " + hoursToAdd + " hours to game time");
+        }
+    }
     void OnDestroy()
     {
         UnSubscribeToGestureEvent();
+        UnSubscribeToTimeSkip();
     }
     /*
     public void DisplayCoordinatesOfCity(CityButtonData data)
@@ -138,8 +163,16 @@ public class LocationManager : MonoBehaviour
         InitializeKeyboard();
         timeScale = TimeScale.hours;
         SubscribeToGestureEvent();
+        SubscribeToTimeSkip();
     }
-
+    void SubscribeToTimeSkip()
+    {
+        GestureDetection.gestureDetection.GripReleasedAfterBeingHeldDown.AddListener(ChangeGameTime);
+    }
+    void UnSubscribeToTimeSkip()
+    {
+        GestureDetection.gestureDetection.GripReleasedAfterBeingHeldDown.RemoveAllListeners();
+    }
     // Update is called once per frame
     void Update()
     {

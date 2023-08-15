@@ -684,10 +684,14 @@ MonoBehaviour:
   RightSecondaryButtonPressed:
     m_PersistentCalls:
       m_Calls: []
+  GripReleasedAfterBeingHeldDown:
+    m_PersistentCalls:
+      m_Calls: []
   leftControllerReference: {fileID: 1271222103}
   rightControllerReference: {fileID: 913348606}
   cameraReference: {fileID: 65385120}
   ControllerAxisLine: {fileID: 996336361}
+  deltaValue: 0
   debounceTime: 0.25
   _debug: 1
 --- !u!1 &162818951
@@ -7735,6 +7739,7 @@ MonoBehaviour:
   confirmDialogBox: {fileID: 815753318941381155}
   parentCanvas: {fileID: 815753318602994247}
   _debug: 1
+  deltaValueMultiplier: 10
   timeScale: 0
   currentCityButtons: []
 --- !u!4 &815753318503383445

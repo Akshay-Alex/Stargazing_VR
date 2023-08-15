@@ -7,7 +7,7 @@ using UnityEngine.XR;
 
 public class GestureDetection : MonoBehaviour
 {
-    public UnityEvent LeftGripPressed, LeftGripReleased, RightGripPressed,RightGripReleased,LeftSecondaryButtonPressed,RightSecondaryButtonPressed;
+    public UnityEvent LeftGripPressed, LeftGripReleased, RightGripPressed,RightGripReleased,LeftSecondaryButtonPressed,RightSecondaryButtonPressed,GripReleasedAfterBeingHeldDown;
     public Transform leftControllerReference, rightControllerReference, cameraReference;
     InputFeatureUsage<bool> gripPressFeature = CommonUsages.gripButton;
     InputFeatureUsage<bool> secondaryButtonFeature = CommonUsages.secondaryButton;
@@ -19,7 +19,8 @@ public class GestureDetection : MonoBehaviour
     public static GestureDetection gestureDetection;
     Vector3 leftRightAxis, startPosition, endPosition,controllerMovementVector, currentControllerMovementVector;
     public LineRenderer ControllerAxisLine;
-    double timeInSeconds, deltaValue;
+    double timeInSeconds;
+    public double deltaValue;
     DateTime startTime;
     float lastLeftSecondaryPressTime, lastRightSecondaryPressTime;
     public float debounceTime;
@@ -35,7 +36,7 @@ public class GestureDetection : MonoBehaviour
         leftControllers = new List<InputDevice>();
         rightControllers = new List<InputDevice>();
         SetDebounceTime();
-        TestEvents();
+        SubscribeToGripEvents();
     }
     void SetDebounceTime()
     {
@@ -62,7 +63,7 @@ public class GestureDetection : MonoBehaviour
         }
         return false;
     }
-    void TestEvents()
+    void SubscribeToGripEvents()
     {
         LeftGripPressed.AddListener(OnLeftGripPressed);
         RightGripPressed.AddListener(OnRightGripPressed);
@@ -88,6 +89,7 @@ public class GestureDetection : MonoBehaviour
         if(isLeftController)
         {
             buttonHeldDown = false;
+            GripReleasedAfterBeingHeldDown.Invoke();
         }
     }
     void OnRightGripReleased()
@@ -95,6 +97,7 @@ public class GestureDetection : MonoBehaviour
         if (!isLeftController)
         {
             buttonHeldDown = false;
+            GripReleasedAfterBeingHeldDown.Invoke();
         }
     }
     // Update is called once per frame
