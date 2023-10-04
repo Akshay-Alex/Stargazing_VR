@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit.Experimental.UI;
 using TMPro;
+using System;
 
 public class LocationManager : MonoBehaviour
 {
@@ -14,8 +15,13 @@ public class LocationManager : MonoBehaviour
     public GameObject scrollViewParentObject;
     public GameObject confirmDialogBox;
     public GameObject parentCanvas;
+    public TextMeshProUGUI timeSkipText;
+    public TextMeshProUGUI dateTimeText;
+    public GameObject cameraUIGO;
     public bool _debug;
     public float deltaValueMultiplier;
+    public float cameraUIPersistanceTime;
+    public Timer cameraUITimer;
     public enum TimeScale
     {
         hours,
@@ -107,6 +113,8 @@ public class LocationManager : MonoBehaviour
     {
         int newTimeScale = ((int)timeScale + 1) % 3;
         timeScale =(TimeScale) newTimeScale;
+        timeSkipText.text = "Current time skip interval: " + timeScale;
+        ShowCameraUI();
         if (_debug)
         {
             Debug.Log("Timescale changed to " + timeScale);
@@ -141,7 +149,9 @@ public class LocationManager : MonoBehaviour
                 break;
         }
         StarGenerator.starGenerator.UpdateStarPosition(hoursToAdd);
-        if(_debug)
+        dateTimeText.text = "In-game date and time: "+StarGenerator.starGenerator.currentGameTime.ToLocalTime().ToString();
+        ShowCameraUI();
+        if (_debug)
         {
             Debug.Log("Adding " + hoursToAdd + " hours to game time");
         }
@@ -150,6 +160,24 @@ public class LocationManager : MonoBehaviour
     {
         UnSubscribeToGestureEvent();
         UnSubscribeToTimeSkip();
+    }
+    void ShowCameraUI()
+    {
+        if(!cameraUIGO.activeSelf)
+        {
+            cameraUIGO.SetActive(true);
+            cameraUITimer.SetTimer(cameraUIPersistanceTime);
+            cameraUITimer.TimerFinished += HideCameraUI;
+        }
+
+    }
+    void HideCameraUI()
+    {
+        cameraUITimer.TimerFinished -= HideCameraUI;
+        if (cameraUIGO.activeSelf)
+        {
+            cameraUIGO.SetActive(false);
+        }
     }
     /*
     public void DisplayCoordinatesOfCity(CityButtonData data)
@@ -161,9 +189,16 @@ public class LocationManager : MonoBehaviour
     void Start()
     {
         InitializeKeyboard();
-        timeScale = TimeScale.hours;
+        SetCameraUI();
         SubscribeToGestureEvent();
         SubscribeToTimeSkip();
+    }
+    void SetCameraUI()
+    {
+        timeScale = TimeScale.hours;
+        cameraUITimer = gameObject.AddComponent<Timer>();
+        timeSkipText.text = timeScale.ToString();
+        dateTimeText.text = DateTime.Now.ToLocalTime().ToString();
     }
     void SubscribeToTimeSkip()
     {

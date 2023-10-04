@@ -32,7 +32,7 @@ public class StarGenerator : MonoBehaviour
         public double RA, Declination; //data is stored in degrees
     }
     private StarInfo siriusStarInfo = new StarInfo();
-    private DateTime currentGameTime;
+    public DateTime currentGameTime;
 
     public double azimuth, altitude, julianDate, referenceStarDecDegree, referenceStarRaDegree;
     public Timer timer;
@@ -164,7 +164,7 @@ public class StarGenerator : MonoBehaviour
 */
     public void UpdateStarPosition(int timeToChangeInHours)
     {
-        currentGameTime = currentGameTime.AddHours(timeToChangeInHours);
+        currentGameTime = currentGameTime.AddHours(timeToChangeInHours).ToUniversalTime();
         FindJulianDate(currentGameTime);
         StartCoroutine("MoveStarsToRealtimePosition");
         
