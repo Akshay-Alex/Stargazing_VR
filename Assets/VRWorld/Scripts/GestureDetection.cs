@@ -18,25 +18,43 @@ public class GestureDetection : MonoBehaviour
     bool isLeftGripPressed, isRightGripPressed, leftGripOutValue, rightGripOutValue,isLeftController,buttonHeldDown,leftSecondaryOutValue,rightSecondaryOutValue;
     public static GestureDetection gestureDetection;
     Vector3 leftRightAxis, startPosition, endPosition,controllerMovementVector, currentControllerMovementVector;
-    public LineRenderer ControllerAxisLine;
     double timeInSeconds;
     public double deltaValue;
     DateTime startTime;
     float lastLeftSecondaryPressTime, lastRightSecondaryPressTime;
     public float debounceTime;
     public bool _debug;
+    public bool _enableVfX;
+    public ParticleSystem LeftSparkParticle, rightSparkParticle;
     // Start is called before the first frame update
     void Start()
     {
         gestureDetection = this;
         isLeftController = false;
         buttonHeldDown = false;
+        _enableVfX = false;
         leftControllerCharacterisitic = InputDeviceCharacteristics.Left;
         rightControllerCharacterisitic = InputDeviceCharacteristics.Right;
         leftControllers = new List<InputDevice>();
         rightControllers = new List<InputDevice>();
         SetDebounceTime();
         SubscribeToGripEvents();
+    }
+    void PlayLeftSpark()
+    {
+        if (_enableVfX)
+        {
+            SFXSoundsManager.sFXSoundsManager.PlayTimeSkipSFX();
+            LeftSparkParticle.Play();
+        }
+    }
+    void PlayRightSpark()
+    {
+        if (_enableVfX)
+        {
+            SFXSoundsManager.sFXSoundsManager.PlayTimeSkipSFX();
+            rightSparkParticle.Play();
+        }
     }
     void SetDebounceTime()
     {
@@ -89,6 +107,7 @@ public class GestureDetection : MonoBehaviour
         if(isLeftController)
         {
             buttonHeldDown = false;
+            PlayLeftSpark();
             GripReleasedAfterBeingHeldDown.Invoke();
         }
     }
@@ -97,6 +116,7 @@ public class GestureDetection : MonoBehaviour
         if (!isLeftController)
         {
             buttonHeldDown = false;
+            PlayRightSpark();
             GripReleasedAfterBeingHeldDown.Invoke();
         }
     }
@@ -128,8 +148,6 @@ public class GestureDetection : MonoBehaviour
             if (_debug)
             {
                 Debug.Log("Delta Value : " + deltaValue);
-                ControllerAxisLine.SetPosition(0, startPosition);
-                ControllerAxisLine.SetPosition(1, endPosition);
             }
         }
     }

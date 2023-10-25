@@ -10,6 +10,7 @@ public class CityButtonData : MonoBehaviour
     public string Longitude;
     public void SelectCity()
     {
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
         locationManager.ShowConfirmDialogBox();
         StarGenerator.starGenerator.SetLatitudeAndLongitude(this);
     }

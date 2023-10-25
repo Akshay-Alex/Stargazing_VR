@@ -40,11 +40,13 @@ public class LocationManager : MonoBehaviour
     }
     public void ConfirmCity()
     {
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
         StarGenerator.starGenerator.GenerateAndPositionStars();
         //StarGenerator.starGenerator.StartTimerForUpdatingStarPosition();
         parentCanvas.SetActive(false);
         NonNativeKeyboard.Instance.gameObject.SetActive(false);
-        if(_debug)
+        GestureDetection.gestureDetection._enableVfX = true;
+        if (_debug)
         {
             Debug.Log("City confirmed");
         }
@@ -85,6 +87,7 @@ public class LocationManager : MonoBehaviour
     }
     public void HideConfirmDialogBox()
     {
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
         scrollViewParentObject.SetActive(true);
         confirmDialogBox.SetActive(false);
     }
@@ -111,15 +114,18 @@ public class LocationManager : MonoBehaviour
     }
     public void ChangeTimeScale()
     {
-        int newTimeScale = ((int)timeScale + 1) % 3;
-        timeScale =(TimeScale) newTimeScale;
-        timeSkipText.text = "Current time skip interval: " + timeScale;
-        ShowCameraUI();
-        if (_debug)
+        if(StarGenerator.starGenerator.starsGenerated)
         {
-            Debug.Log("Timescale changed to " + timeScale);
-        }
-        
+            int newTimeScale = ((int)timeScale + 1) % 3;
+            timeScale = (TimeScale)newTimeScale;
+            timeSkipText.text = "Current time skip interval: " + timeScale;
+            ShowCameraUI();
+            SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
+            if (_debug)
+            {
+                Debug.Log("Timescale changed to " + timeScale);
+            }
+        }        
     }
     void SubscribeToGestureEvent()
     {
@@ -133,27 +139,30 @@ public class LocationManager : MonoBehaviour
     }
     void ChangeGameTime()
     {
-        int hoursToAdd = 0;
-        switch(timeScale)
+        if (StarGenerator.starGenerator.starsGenerated)
         {
-            case TimeScale.hours:
-                hoursToAdd =(int) Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue));
-                break;
-            case TimeScale.days:
-                hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue * 24));
-                break;
-            case TimeScale.weeks:
-                hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue * 168));
-                break;
-            default:
-                break;
-        }
-        StarGenerator.starGenerator.UpdateStarPosition(hoursToAdd);
-        dateTimeText.text = "In-game date and time: "+StarGenerator.starGenerator.currentGameTime.ToLocalTime().ToString();
-        ShowCameraUI();
-        if (_debug)
-        {
-            Debug.Log("Adding " + hoursToAdd + " hours to game time");
+            int hoursToAdd = 0;
+            switch (timeScale)
+            {
+                case TimeScale.hours:
+                    hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue));
+                    break;
+                case TimeScale.days:
+                    hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue * 24));
+                    break;
+                case TimeScale.weeks:
+                    hoursToAdd = (int)Mathf.Round((float)(deltaValueMultiplier * GestureDetection.gestureDetection.deltaValue * 168));
+                    break;
+                default:
+                    break;
+            }
+            StarGenerator.starGenerator.UpdateStarPosition(hoursToAdd);
+            dateTimeText.text = "In-game date and time: " + StarGenerator.starGenerator.currentGameTime.ToLocalTime().ToString();
+            ShowCameraUI();
+            if (_debug)
+            {
+                Debug.Log("Adding " + hoursToAdd + " hours to game time");
+            }
         }
     }
     void OnDestroy()

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3781695238936461548}
   - component: {fileID: 2909543852923223753}
   - component: {fileID: 7909372607999856207}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 6266969207123017659}
   - component: {fileID: 2672830226364060472}
   - component: {fileID: 1241194874339146952}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: CityButtonPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

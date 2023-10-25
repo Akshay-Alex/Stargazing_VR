@@ -18,8 +18,8 @@ public class StarGenerator : MonoBehaviour
     public GameObject StarParent;
     public GameObject Compass;
     //flags
-    private bool starsGenerated, JulianDateWebRequestDone;
-    public bool ShowTwoStars;
+    private bool JulianDateWebRequestDone;
+    public bool ShowTwoStars, starsGenerated;
     //class used to parse json data
     [System.Serializable]
     public class JulianDateData
@@ -73,7 +73,7 @@ public class StarGenerator : MonoBehaviour
     public void ToggleStarVisibility()
     {
         Transform starParentTransform = StarParent.transform;
-            for(int index = 2; index < maxParticles-1; index++)
+            for(int index = 0; index < maxParticles-1; index++)
             {
                 starParentTransform.GetChild(index).gameObject.SetActive(!ShowTwoStars);
             }

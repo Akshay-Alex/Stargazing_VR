@@ -20,18 +20,22 @@ public class ButtonManager : MonoBehaviour
     public void ToggleStars()
     {
         StarGenerator.starGenerator.ToggleStarVisibility();
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
     }
     public void ToggleLogs()
     {
         logs.SetActive(!logs.activeSelf);
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
     }
     public void ToggleCompass()
     {
         compass.SetActive(!compass.activeSelf);
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
     }
     public void ToggleMenu()
     {
         menu.SetActive(!menu.activeSelf);
+        SFXSoundsManager.sFXSoundsManager.PlayButtonClickSFX();
     }
     public void QuitApp()
     {
