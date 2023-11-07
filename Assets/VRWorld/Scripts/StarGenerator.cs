@@ -38,7 +38,7 @@ public class StarGenerator : MonoBehaviour
     public Timer timer;
 
     //properties
-
+    MaterialPropertyBlock propertyBlock;
 
     //variables used to parse excel sheet
     //public TextAsset StarData;
@@ -265,7 +265,10 @@ public class StarGenerator : MonoBehaviour
     {
         var star = Instantiate(StarPrefab, position, Quaternion.identity);
         star.transform.SetParent(StarParent.transform);
-        star.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.white * (5.0f - (float)(magnitude)));
+        propertyBlock = new MaterialPropertyBlock();
+        propertyBlock.SetColor("_EmissionColor", Color.white * (5.0f - (float)(magnitude)));
+        //star.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.white * (5.0f - (float)(magnitude)));
+        star.GetComponent<Renderer>().SetPropertyBlock(propertyBlock);
         star.gameObject.name = "star" + starID;
         stars.Insert(starID, star);
         //stars[starID] = star;
